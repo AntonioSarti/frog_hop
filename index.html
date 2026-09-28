@@ -594,6 +594,89 @@ button {
     line-height: 1.4;
 }
 
+.victory-box {
+    max-width: 430px;
+    text-align: center;
+}
+
+.victory-symbol {
+    font-size: 42px;
+    margin-bottom: 6px;
+}
+
+.victory-kicker {
+    margin: 0 0 5px;
+    color: #7ce6a3;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.victory-box h3 {
+    margin-bottom: 8px;
+}
+
+.victory-box #victory-text {
+    margin: 0 auto 12px;
+    max-width: 360px;
+}
+
+.final-victory {
+    border: 2px solid #77d99a;
+    background: #102b2a;
+    box-shadow: 0 0 0 5px rgba(119,217,154,.12);
+}
+
+.final-victory .victory-symbol {
+    font-size: 50px;
+}
+
+.final-victory .victory-kicker {
+    color: #ffe27a;
+}
+
+.final-victory h3 {
+    color: #a4f0b9;
+    font-size: 26px;
+}
+
+.final-victory #victory-text {
+    color: #e1f4e5;
+}
+
+.victory-final-note {
+    display: none;
+    margin: 12px 0;
+    padding: 10px;
+    border: 1px solid #397b58;
+    border-radius: 12px;
+    background: #183d35;
+    color: #d8f4df;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.final-victory .victory-final-note {
+    display: block;
+}
+
+.victory-moves {
+    display: inline-block;
+    margin: 8px 4px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    background: rgba(0,0,0,.2);
+}
+
+.victory-close-button {
+    display: none;
+}
+
+.final-victory .victory-close-button {
+    display: inline-block;
+}
+
 .tutorial-item {
     display: flex;
     align-items: flex-start;
@@ -998,17 +1081,23 @@ button {
 
     <div id="victoryModal" class="modal">
 
-        <div class="modal-box" style="max-width:430px;text-align:center;">
+        <div id="victory-box" class="modal-box victory-box">
 
-            <div style="font-size:45px;">🎉🐸✨</div>
+            <div class="victory-symbol">🎉🐸✨</div>
 
-            <h3>Parabéns!</h3>
+            <p class="victory-kicker">DESAFIO CONCLUÍDO</p>
+
+            <h3>Parabéns, sapinhos!</h3>
 
             <p id="victory-text">
                 Você ajudou os sapinhos a trocarem de lado!
             </p>
 
-            <div class="moves" style="display:inline-block;margin:10px;">
+            <div class="victory-final-note">
+                🌿 A lagoa está salva e os sapinhos podem comemorar juntos! 🌿
+            </div>
+
+            <div class="moves victory-moves">
                 <span class="moves-label">Total de movimentos</span>
                 <span id="victory-moves">0</span>
             </div>
@@ -1026,6 +1115,12 @@ button {
                     class="action-button green"
                     onclick="nextLevel()">
                     Próxima Fase
+                </button>
+
+                <button
+                    class="action-button victory-close-button"
+                    onclick="closeModal('victoryModal')">
+                    Voltar à Lagoa
                 </button>
 
             </div>
@@ -1652,15 +1747,23 @@ function checkGameStatus() {
         if (currentLevel === 5) {
 
             document.getElementById(
+                "victory-box"
+            ).className = "modal-box victory-box final-victory";
+
+            document.getElementById(
                 "next-level-btn"
             ).style.display = "none";
 
             document.getElementById(
                 "victory-text"
             ).innerHTML =
-                "Incrível! Você concluiu todas as 5 fases e salvou a lagoa inteira!";
+                "Você venceu as cinco fases e levou todos os sapinhos para a margem certa!";
 
         } else {
+
+            document.getElementById(
+                "victory-box"
+            ).className = "modal-box victory-box";
 
             document.getElementById(
                 "next-level-btn"
