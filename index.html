@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulo dos Sapos - Versão Leve</title>
+
+<style>
+/* =========================================================
+   PULO DOS SAPOS - Refatorado
+   Versão Lite - sem bibliotecas externas
+   Compatível com Firefox antigo
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    background: #123d72;
+    overflow-x: hidden;
+    user-select: none;
+}
+
+/* ---------- CENÁRIO ---------- */
+
+#game {
+    min-height: 100vh;
+    position: relative;
+    background:
+        linear-gradient(to bottom,
+            #111d3b 0%,
+            #1c4384 45%,
+            #287bc0 100%);
+}
+
+.stars {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 45%;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    color: #fff5a8;
+    font-size: 13px;
+    opacity: .75;
+}
+
+.moon {
+    position: absolute;
+    left: 28px;
+    top: 24px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #fff1b0;
+    box-shadow: 0 0 18px rgba(255,235,140,.65);
+}
+
+.cloud {
+    position: absolute;
+    color: rgba(255,255,255,.45);
+    font-size: 42px;
+    white-space: nowrap;
+    animation: cloudMove 40s linear infinite;
+}
+
+.cloud.one {
+    top: 70px;
+}
+
+.cloud.two {
+    top: 130px;
+    font-size: 32px;
+    animation-delay: -18s;
+}
+
+@keyframes cloudMove {
+    from { left: -120px; }
+    to { left: 110%; }
+}
+
+/* ---------- LAYOUT ---------- */
+
+.page {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(5,30,70,.78);
+    border: 1px solid rgba(120,190,255,.35);
+    border-radius: 14px;
+    padding: 8px 13px;
+}
+
+.logo-frog {
+    font-size: 25px;
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #ffe76a;
+}
+
+.logo p {
+    margin: 2px 0 0;
+    color: #b9d9ff;
+    font-size: 13px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 7px;
+}
+
+button {
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+.header-button,
+.level-button,
+.action-button {
+    border: 0;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.header-button {
+    padding: 9px 12px;
+    background: #d99500;
+    color: #271900;
+}
+
+.header-button.sound {
+    width: 40px;
+    padding: 9px 0;
+    background: #174b91;
+    color: #fff;
+}
+
+.header-button:hover,
+.level-button:hover,
+.action-button:hover {
+    filter: brightness(1.1);
+}
+
+/* ---------- FASES ---------- */
+
+.level-menu {
+    text-align: center;
+    background: rgba(0,0,0,.28);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 13px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.level-label {
+    color: #b9d9ff;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.level-button {
+    padding: 7px 11px;
+    margin: 2px;
+    background: #3c4b60;
+    color: #c8d0db;
+}
+
+.level-button.active {
+    background: #079447;
+    color: #fff;
+}
+
+.level-button.unlocked {
+    background: #155da7;
+    color: #fff;
+}
+
+.level-button.locked {
+    background: #424c59;
+    color: #8993a0;
+    cursor: not-allowed;
+}
+
+/* ---------- PAINEL ---------- */
+
+.info-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    background: rgba(3,25,58,.85);
+    border: 1px solid rgba(70,150,230,.4);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.info-panel h2 {
+    margin: 0 0 4px;
+    color: #ffe76a;
+    font-size: 19px;
+}
+
+.info-panel p {
+    margin: 0;
+    color: #b8d8f7;
+    font-size: 13px;
+}
+
+.stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.moves {
+    text-align: center;
+    background: #123d78;
+    border: 1px solid #477cb6;
+    border-radius: 9px;
+    padding: 5px 11px;
+}
+
+.moves-label {
+    display: block;
+    color: #a9c9ec;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+#move-counter {
+    display: block;
+    color: #ffe76a;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.action-button {
+    padding: 9px 12px;
+    background: #dc3150;
+}
+
+.action-button.green {
+    background: #09954b;
+}
+
+/* ---------- LAGOA ---------- */
+
+.lagoon {
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 35px 20px;
+    border-radius: 20px;
+    border: 4px solid rgba(30,160,90,.55);
+    background:
+        linear-gradient(to bottom,
+            #1f3e8d 0%,
+            #087fbd 45%,
+            #075b91 100%);
+    overflow: hidden;
+}
+
+.reeds {
+    position: absolute;
+    bottom: 8px;
+    color: rgba(40,220,130,.28);
+    font-size: 30px;
+}
+
+.reeds.left {
+    left: 10px;
+}
+
+.reeds.right {
+    right: 10px;
+}
+
+#feedback-alert {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #d92d4d;
+    color: white;
+    padding: 7px 13px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: bold;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 20;
+}
+
+#feedback-alert.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ---------- TABULEIRO ---------- */
+
+#board-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 7px;
+}
+
+.board-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 82px;
+    text-align: center;
+    position: relative;
+}
+
+.stone {
+    position: relative;
+    width: 100%;
+    height: 58px;
+    border-radius: 48% 44% 46% 42%;
+    border: 2px solid rgba(240,215,170,.4);
+    background:
+        linear-gradient(150deg,
+            #c7a777 0%,
+            #956c43 45%,
+            #62452d 100%);
+    box-shadow:
+        inset 0 3px 4px rgba(255,255,255,.25),
+        inset 0 -5px 6px rgba(30,15,5,.35),
+        0 5px 8px rgba(0,0,0,.3);
+    cursor: pointer;
+}
+
+.stone:hover {
+    filter: brightness(1.1);
+}
+
+.stone:before {
+    content: "";
+    position: absolute;
+    width: 25%;
+    height: 18%;
+    top: 18%;
+    left: 20%;
+    border-radius: 50%;
+    background: rgba(255,240,210,.35);
+}
+
+/* ---------- SAPOS ---------- */
+
+.frog-holder {
+    position: absolute;
+    left: 50%;
+    top: -23px;
+    transform: translateX(-50%);
+    width: 58px;
+    height: 55px;
+    z-index: 5;
+}
+
+.frog {
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    width: 42px;
+    height: 30px;
+    border-radius: 48% 48% 42% 42%;
+    box-shadow:
+        inset 0 -5px 0 var(--shadow),
+        0 4px 6px rgba(0,0,0,.45);
+    background: var(--color);
+}
+
+.frog:before,
+.frog:after {
+    content: "";
+    position: absolute;
+    top: -7px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--color);
+    box-shadow: inset 0 -2px 0 var(--shadow);
+}
+
+.frog:before {
+    left: 3px;
+}
+
+.frog:after {
+    right: 3px;
+}
+
+.frog-eyes {
+    position: absolute;
+    z-index: 3;
+    top: -3px;
+    left: 8px;
+    width: 5px;
+    height: 6px;
+    border-radius: 50%;
+    background: #172033;
+    box-shadow: 20px 0 #172033;
+}
+
+.frog-belly {
+    position: absolute;
+    left: 10px;
+    bottom: 4px;
+    width: 22px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.28);
+}
+
+.frog-feet {
+    position: absolute;
+    bottom: -3px;
+    left: 2px;
+    width: 10px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--shadow);
+    box-shadow: 28px 0 var(--shadow);
+}
+
+.direction {
+    position: absolute;
+    left: 4px;
+    bottom: -17px;
+    width: 34px;
+    height: 21px;
+    border: 1px solid rgba(255,255,255,.75);
+    border-radius: 20px;
+    background: var(--color);
+    color: white;
+    font-size: 18px;
+    line-height: 19px;
+    font-weight: bold;
+}
+
+.direction.right:after {
+    content: ">";
+}
+
+.direction.left:after {
+    content: "<";
+}
+
+/* ---------- ANIMAÇÕES ---------- */
+
+.jump {
+    animation: jump .4s ease;
+}
+
+.shake {
+    animation: shake .3s ease;
+}
+
+@keyframes jump {
+    0% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-35px);
+    }
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { margin-left: 0; }
+    25% { margin-left: -5px; }
+    75% { margin-left: 5px; }
+}
+
+/* ---------- LEGENDA ---------- */
+
+.legend {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.legend-box {
+    display: inline-block;
+    background: rgba(0,0,0,.4);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.green-text {
+    color: #58e694;
+    font-weight: bold;
+}
+
+.red-text {
+    color: #ff7189;
+    font-weight: bold;
+}
+
+/* ---------- RODAPÉ ---------- */
+
+.footer {
+    text-align: center;
+    color: rgba(180,215,245,.75);
+    font-size: 11px;
+    padding: 8px;
+}
+
+/* ---------- MODAIS ---------- */
+
+.modal {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: rgba(0,0,0,.75);
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #111b2e;
+    border: 1px solid #d99c22;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.modal-box h3 {
+    margin: 0 0 15px;
+    color: #ffd965;
+    font-size: 23px;
+}
+
+.modal-box p {
+    color: #d3deec;
+    line-height: 1.4;
+}
+
+.tutorial-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #1b273c;
+    border: 1px solid #34435a;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 9px;
+}
+
+.tutorial-icon {
+    width: 45px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 27px;
+}
+
+.tutorial-item h4 {
+    margin: 0 0 4px;
+    color: #68e79a;
+}
+
+.tutorial-item p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.modal-buttons {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.close-button {
+    float: right;
+    border: 0;
+    background: #27344a;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+/* ---------- RESPONSIVO ---------- */
+
+@media (max-width: 650px) {
+
+    .page {
+        padding: 7px;
+    }
+
+    .header {
+        align-items: flex-start;
+    }
+
+    .logo h1 {
+        font-size: 17px;
+    }
+
+    .logo p {
+        font-size: 11px;
+    }
+
+    .header-button {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .info-panel {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .stats {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .lagoon {
+        min-height: 245px;
+        padding: 30px 5px;
+        border-width: 3px;
+    }
+
+    #board-container {
+        gap: 2px;
+    }
+
+    .stone {
+        height: 45px;
+    }
+
+    .frog-holder {
+        transform: translateX(-50%) scale(.82);
+    }
+
+    .legend-box {
+        font-size: 11px;
+    }
+
+    .moon {
+        width: 45px;
+        height: 45px;
+        left: 15px;
+        top: 18px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .logo-frog {
+        display: none;
+    }
+
+    .logo {
+        padding: 7px 9px;
+    }
+
+    .level-button {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    .info-panel h2 {
+        font-size: 16px;
+    }
+
+    .info-panel p {
+        font-size: 11px;
+    }
+
+    .stone {
+        height: 39px;
+    }
+
+    .frog-holder {
+        transform: translateX(-50%) scale(.70);
+    }
+
+    .direction {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- Cenário simples -->
+    <div class="stars" aria-hidden="true">
+        <span class="star" style="left:12%;top:15%;">★</span>
+        <span class="star" style="left:28%;top:28%;">★</span>
+        <span class="star" style="left:48%;top:12%;">★</span>
+        <span class="star" style="left:70%;top:25%;">★</span>
+        <span class="star" style="left:86%;top:14%;">★</span>
+        <span class="star" style="left:61%;top:38%;">★</span>
+        <span class="star" style="left:8%;top:42%;">★</span>
+    </div>
+
+    <div class="moon" aria-hidden="true"></div>
+    <div class="cloud one" aria-hidden="true">☁</div>
+    <div class="cloud two" aria-hidden="true">☁</div>
+
+    <div class="page">
+
+        <!-- CABEÇALHO -->
+        <header class="header">
+
+            <div class="logo">
+                <div class="logo-frog">🐸</div>
+                <div>
+                    <h1>Pulo dos Sapos</h1>
+                    <p id="header-level-text">Fase 1 de 5</p>
+                </div>
+            </div>
+
+            <div class="header-buttons">
+                <button
+                    class="header-button"
+                    onclick="openModal('tutorialModal')">
+                    📖 Como Jogar
+                </button>
+
+                <button
+                    id="soundToggleBtn"
+                    class="header-button sound"
+                    onclick="toggleSound()"
+                    title="Ativar ou desativar som">
+                    🔊
+                </button>
+            </div>
+
+        </header>
+
+        <!-- SELEÇÃO DE FASE -->
+        <div class="level-menu">
+
+            <span class="level-label">FASES:</span>
+
+            <button
+                id="btn-lvl-1"
+                class="level-button active"
+                onclick="switchLevel(1)">
+                Fase 1
+            </button>
+
+            <button
+                id="btn-lvl-2"
+                class="level-button locked"
+                onclick="switchLevel(2)">
+                Fase 2
+            </button>
+
+            <button
+                id="btn-lvl-3"
+                class="level-button locked"
+                onclick="switchLevel(3)">
+                Fase 3
+            </button>
+
+            <button
+                id="btn-lvl-4"
+                class="level-button locked"
+                onclick="switchLevel(4)">
+                Fase 4
+            </button>
+
+            <button
+                id="btn-lvl-5"
+                class="level-button locked"
+                onclick="switchLevel(5)">
+                Fase 5
+            </button>
+
+        </div>
+
+        <!-- INFORMAÇÕES -->
+        <div class="info-panel">
+
+            <div>
+                <h2 id="level-title">Fase 1: O Primeiro Salto</h2>
+                <p id="level-desc">
+                    1 sapo verde e 1 sapo vermelho (3 pedras).
+                </p>
+            </div>
+
+            <div class="stats">
+
+                <div class="moves">
+                    <span class="moves-label">Movimentos</span>
+                    <span id="move-counter">0</span>
+                </div>
+
+                <button
+                    class="action-button"
+                    onclick="resetCurrentLevel()">
+                    ↻ Reiniciar
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- LAGOA -->
+        <div class="lagoon">
+
+            <div class="reeds left" aria-hidden="true">🌿 🌿</div>
+            <div class="reeds right" aria-hidden="true">🌿 🌿</div>
+
+            <div id="feedback-alert">
+                Movimento inválido!
+            </div>
+
+            <div id="board-container"></div>
+
+        </div>
+
+        <!-- LEGENDA -->
+        <div class="legend">
+
+            <div class="legend-box">
+
+                <span>
+                    🐸 Verdes:
+                    <span class="green-text">Direita →</span>
+                </span>
+
+                &nbsp; | &nbsp;
+
+                <span>
+                    🐸 Vermelhos:
+                    <span class="red-text">Esquerda ←</span>
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- RODAPÉ -->
+        <footer class="footer">
+            Desenvolvido por Antonio C. G. Sarti -
+            HTML5, CSS e JavaScript -
+            Baseado no desafio clássico Frog Hop
+        </footer>
+
+    </div>
+
+
+    <!-- =====================================================
+         TUTORIAL
+         ===================================================== -->
+
+    <div id="tutorialModal" class="modal show">
+
+        <div class="modal-box">
+
+            <button
+                class="close-button"
+                onclick="closeModal('tutorialModal')">
+                ×
+            </button>
+
+            <h3>🐸 Como Jogar com os Sapinhos!</h3>
+
+            <div class="tutorial-item">
+
+                <div class="tutorial-icon">🐸</div>
+
+                <div>
+                    <h4>Sapos Verdes</h4>
+                    <p>
+                        Começam à esquerda e seguem para a direita.
+                        Clique em um sapo verde para movê-lo.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="tutorial-item">
+
+                <div class="tutorial-icon">🐸</div>
+
+                <div>
+                    <h4 style="color:#ff7189;">Sapos Vermelhos</h4>
+                    <p>
+                        Começam à direita e seguem para a esquerda.
+                        Clique em um sapo vermelho para movê-lo.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="tutorial-item">
+
+                <div class="tutorial-icon">📖</div>
+
+                <div>
+                    <h4 style="color:#ffe76a;">Como pular</h4>
+                    <p>
+                        Um sapo pode avançar para a pedra vazia ao lado
+                        ou pular por cima de outro sapo.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="tutorial-item">
+
+                <div class="tutorial-icon">🏆</div>
+
+                <div>
+                    <h4 style="color:#61d8ee;">Objetivo</h4>
+                    <p>
+                        Leve todos os sapos verdes para a direita
+                        e todos os vermelhos para a esquerda.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="modal-buttons">
+
+                <button
+                    class="action-button green"
+                    onclick="closeModal('tutorialModal')">
+                    Jogar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         VITÓRIA
+         ===================================================== -->
+
+    <div id="victoryModal" class="modal">
+
+        <div class="modal-box" style="max-width:430px;text-align:center;">
+
+            <div style="font-size:45px;">🎉🐸✨</div>
+
+            <h3>Parabéns!</h3>
+
+            <p id="victory-text">
+                Você ajudou os sapinhos a trocarem de lado!
+            </p>
+
+            <div class="moves" style="display:inline-block;margin:10px;">
+                <span class="moves-label">Total de movimentos</span>
+                <span id="victory-moves">0</span>
+            </div>
+
+            <div class="modal-buttons">
+
+                <button
+                    class="action-button"
+                    onclick="resetCurrentLevel();closeModal('victoryModal');">
+                    Jogar de Novo
+                </button>
+
+                <button
+                    id="next-level-btn"
+                    class="action-button green"
+                    onclick="nextLevel()">
+                    Próxima Fase
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GAME OVER
+         ===================================================== -->
+
+    <div id="gameOverModal" class="modal">
+
+        <div class="modal-box" style="max-width:430px;text-align:center;">
+
+            <div style="font-size:45px;">😢🐸🚧</div>
+
+            <h3 style="color:#ff7189;">
+                Ops! Sapinhos Presos!
+            </h3>
+
+            <p>
+                Não há mais movimentos possíveis.
+                Vamos tentar novamente?
+            </p>
+
+            <div class="modal-buttons">
+
+                <button
+                    class="action-button"
+                    onclick="resetCurrentLevel();closeModal('gameOverModal');">
+                    ↻ Tentar Novamente
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   PULO DOS SAPOS
+   JavaScript simples, sem bibliotecas externas
+   ========================================================= */
+
+var soundEnabled = true;
+var audioCtx = null;
+
+var currentLevel = 1;
+var maxUnlockedLevel = 1;
+var movesCount = 0;
+var boardState = [];
+
+/*
+ * 1  = sapo verde, anda para a direita
+ * -1 = sapo vermelho, anda para a esquerda
+ * 0  = pedra vazia
+ */
+
+var levelData = {
+    1: {
+        pairs: 1,
+        title: "Fase 1: O Primeiro Salto",
+        desc: "1 sapo verde e 1 sapo vermelho (3 pedras)."
+    },
+
+    2: {
+        pairs: 2,
+        title: "Fase 2: Encontro na Lagoa",
+        desc: "2 sapos verdes e 2 vermelhos (5 pedras)."
+    },
+
+    3: {
+        pairs: 3,
+        title: "Fase 3: Salto Duplo na Margem",
+        desc: "3 sapos verdes e 3 vermelhos (7 pedras)."
+    },
+
+    4: {
+        pairs: 4,
+        title: "Fase 4: Dança das Cores",
+        desc: "4 sapos verdes e 4 vermelhos (9 pedras)."
+    },
+
+    5: {
+        pairs: 5,
+        title: "Fase 5: O Grande Desafio do Lago",
+        desc: "5 sapos verdes e 5 vermelhos (11 pedras)."
+    }
+};
+
+
+/* =========================================================
+   SOM
+   ========================================================= */
+
+function initAudio() {
+
+    if (audioCtx) {
+        return;
+    }
+
+    var AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+        return;
+    }
+
+    try {
+        audioCtx = new AudioContextClass();
+    } catch (e) {
+        audioCtx = null;
+    }
+}
+
+
+function playSound(type) {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    initAudio();
+
+    if (!audioCtx) {
+        return;
+    }
+
+    if (audioCtx.state === "suspended") {
+        try {
+            audioCtx.resume();
+        } catch (e) {}
+    }
+
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    var now = audioCtx.currentTime;
+
+    if (type === "jump") {
+
+        osc.type = "sine";
+
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(
+            600,
+            now + 0.15
+        );
+
+        gain.gain.setValueAtTime(.25, now);
+        gain.gain.exponentialRampToValueAtTime(
+            .01,
+            now + .15
+        );
+
+        osc.start(now);
+        osc.stop(now + .15);
+
+    } else if (type === "error") {
+
+        osc.type = "square";
+
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.setValueAtTime(100, now + .1);
+
+        gain.gain.setValueAtTime(.15, now);
+        gain.gain.exponentialRampToValueAtTime(
+            .01,
+            now + .18
+        );
+
+        osc.start(now);
+        osc.stop(now + .18);
+
+    } else if (type === "win") {
+
+        osc.type = "triangle";
+
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.setValueAtTime(550, now + .15);
+        osc.frequency.setValueAtTime(800, now + .3);
+
+        gain.gain.setValueAtTime(.25, now);
+        gain.gain.exponentialRampToValueAtTime(
+            .01,
+            now + .5
+        );
+
+        osc.start(now);
+        osc.stop(now + .5);
+    }
+}
+
+
+function toggleSound() {
+
+    soundEnabled = !soundEnabled;
+
+    var button = document.getElementById(
+        "soundToggleBtn"
+    );
+
+    if (soundEnabled) {
+
+        button.innerHTML = "🔊";
+        playSound("jump");
+
+    } else {
+
+        button.innerHTML = "🔇";
+    }
+}
+
+
+/* =========================================================
+   CARREGAMENTO DA FASE
+   ========================================================= */
+
+function loadLevel(level) {
+
+    currentLevel = level;
+    movesCount = 0;
+    boardState = [];
+
+    var pairs = levelData[level].pairs;
+
+    var i;
+
+    for (i = 0; i < pairs; i++) {
+        boardState.push(1);
+    }
+
+    boardState.push(0);
+
+    for (i = 0; i < pairs; i++) {
+        boardState.push(-1);
+    }
+
+    updateUIStats();
+    renderBoard();
+}
+
+
+/* =========================================================
+   ATUALIZA INTERFACE
+   ========================================================= */
+
+function updateUIStats() {
+
+    document.getElementById(
+        "move-counter"
+    ).innerHTML = movesCount;
+
+    document.getElementById(
+        "header-level-text"
+    ).innerHTML =
+        "Fase " + currentLevel + " de 5";
+
+    document.getElementById(
+        "level-title"
+    ).innerHTML =
+        levelData[currentLevel].title;
+
+    document.getElementById(
+        "level-desc"
+    ).innerHTML =
+        levelData[currentLevel].desc;
+
+    var i;
+    var button;
+
+    for (i = 1; i <= 5; i++) {
+
+        button = document.getElementById(
+            "btn-lvl-" + i
+        );
+
+        button.className = "level-button";
+
+        if (i === currentLevel) {
+
+            button.className += " active";
+
+        } else if (i <= maxUnlockedLevel) {
+
+            button.className += " unlocked";
+
+        } else {
+
+            button.className += " locked";
+        }
+    }
+}
+
+
+/* =========================================================
+   CLIQUE NO SAPO
+   ========================================================= */
+
+function handleFrogClick(index) {
+
+    var frogType = boardState[index];
+
+    if (frogType === 0) {
+        return;
+    }
+
+    var step = frogType;
+    var targetIndex = -1;
+
+    /*
+     * Movimento de uma pedra
+     */
+    if (
+        boardState[index + step] === 0
+    ) {
+
+        targetIndex = index + step;
+
+    /*
+     * Salto sobre outro sapo
+     */
+    } else if (
+        boardState[index + (step * 2)] === 0 &&
+        boardState[index + step] !== 0
+    ) {
+
+        targetIndex = index + (step * 2);
+    }
+
+
+    if (targetIndex !== -1) {
+
+        playSound("jump");
+
+        boardState[targetIndex] = frogType;
+        boardState[index] = 0;
+
+        movesCount++;
+
+        updateUIStats();
+        renderBoard(targetIndex);
+
+        setTimeout(
+            checkGameStatus,
+            350
+        );
+
+    } else {
+
+        playSound("error");
+
+        showFeedback(
+            "Movimento inválido! O sapinho não pode recuar ou o caminho está bloqueado."
+        );
+
+        shakeStone(index);
+    }
+}
+
+
+/* =========================================================
+   DESENHA TABULEIRO
+   ========================================================= */
+
+function renderBoard(animatedIndex) {
+
+    var container =
+        document.getElementById(
+            "board-container"
+        );
+
+    container.innerHTML = "";
+
+    var i;
+    var value;
+
+    for (
+        i = 0;
+        i < boardState.length;
+        i++
+    ) {
+
+        value = boardState[i];
+
+        var cell =
+            document.createElement("div");
+
+        cell.className = "board-cell";
+
+        var stone =
+            document.createElement("div");
+
+        stone.className = "stone";
+
+        stone.setAttribute(
+            "data-index",
+            i
+        );
+
+        stone.onclick = (function(index) {
+
+            return function() {
+                handleFrogClick(index);
+            };
+
+        })(i);
+
+
+        if (value !== 0) {
+
+            var holder =
+                document.createElement("div");
+
+            holder.className =
+                "frog-holder";
+
+            if (i === animatedIndex) {
+
+                holder.className += " jump";
+            }
+
+            var frog =
+                document.createElement("div");
+
+            frog.className = "frog";
+
+            if (value === 1) {
+
+                frog.style.setProperty(
+                    "--color",
+                    "#22c55e"
+                );
+
+                frog.style.setProperty(
+                    "--shadow",
+                    "#15803d"
+                );
+
+            } else {
+
+                frog.style.setProperty(
+                    "--color",
+                    "#ef4444"
+                );
+
+                frog.style.setProperty(
+                    "--shadow",
+                    "#b91c1c"
+                );
+            }
+
+
+            var eyes =
+                document.createElement("span");
+
+            eyes.className = "frog-eyes";
+
+
+            var belly =
+                document.createElement("span");
+
+            belly.className = "frog-belly";
+
+
+            var feet =
+                document.createElement("span");
+
+            feet.className = "frog-feet";
+
+
+            frog.appendChild(eyes);
+            frog.appendChild(belly);
+            frog.appendChild(feet);
+
+
+            var direction =
+                document.createElement("span");
+
+            direction.className =
+                "direction " +
+                (value === 1 ? "right" : "left");
+
+
+            holder.appendChild(frog);
+            holder.appendChild(direction);
+
+            stone.appendChild(holder);
+        }
+
+
+        cell.appendChild(stone);
+        container.appendChild(cell);
+    }
+}
+
+
+/* =========================================================
+   FEEDBACK
+   ========================================================= */
+
+function showFeedback(message) {
+
+    var box =
+        document.getElementById(
+            "feedback-alert"
+        );
+
+    box.innerHTML = message;
+    box.className = "visible";
+
+    setTimeout(function() {
+
+        box.className = "";
+
+    }, 2200);
+}
+
+
+function shakeStone(index) {
+
+    var stones =
+        document.getElementsByClassName(
+            "stone"
+        );
+
+    if (!stones[index]) {
+        return;
+    }
+
+    var holder =
+        stones[index].getElementsByClassName(
+            "frog-holder"
+        )[0];
+
+    if (!holder) {
+        return;
+    }
+
+    holder.className =
+        "frog-holder shake";
+
+    setTimeout(function() {
+
+        holder.className =
+            "frog-holder";
+
+    }, 300);
+}
+
+
+/* =========================================================
+   VERIFICAÇÃO DO JOGO
+   ========================================================= */
+
+function checkGameStatus() {
+
+    var pairs =
+        levelData[currentLevel].pairs;
+
+    var won = true;
+    var i;
+
+
+    /*
+     * Vermelhos precisam estar à esquerda
+     */
+    for (
+        i = 0;
+        i < pairs;
+        i++
+    ) {
+
+        if (boardState[i] !== -1) {
+            won = false;
+        }
+    }
+
+
+    /*
+     * Verdes precisam estar à direita
+     */
+    for (
+        i = boardState.length - pairs;
+        i < boardState.length;
+        i++
+    ) {
+
+        if (boardState[i] !== 1) {
+            won = false;
+        }
+    }
+
+
+    if (won) {
+
+        playSound("win");
+
+        if (
+            currentLevel < 5 &&
+            currentLevel >= maxUnlockedLevel
+        ) {
+
+            maxUnlockedLevel =
+                currentLevel + 1;
+        }
+
+        document.getElementById(
+            "victory-moves"
+        ).innerHTML = movesCount;
+
+
+        if (currentLevel === 5) {
+
+            document.getElementById(
+                "next-level-btn"
+            ).style.display = "none";
+
+            document.getElementById(
+                "victory-text"
+            ).innerHTML =
+                "Incrível! Você concluiu todas as 5 fases e salvou a lagoa inteira!";
+
+        } else {
+
+            document.getElementById(
+                "next-level-btn"
+            ).style.display = "inline-block";
+
+            document.getElementById(
+                "victory-text"
+            ).innerHTML =
+                "Você concluiu a Fase " +
+                currentLevel +
+                " em " +
+                movesCount +
+                " movimentos!";
+        }
+
+        openModal("victoryModal");
+
+        return;
+    }
+
+
+    /*
+     * Verifica se ainda existe algum movimento
+     */
+    if (!canAnyFrogMove()) {
+
+        openModal("gameOverModal");
+    }
+}
+
+
+function canAnyFrogMove() {
+
+    var i;
+    var value;
+    var step;
+
+    for (
+        i = 0;
+        i < boardState.length;
+        i++
+    ) {
+
+        value = boardState[i];
+
+        if (value === 0) {
+            continue;
+        }
+
+        step = value;
+
+
+        if (
+            boardState[i + step] === 0
+        ) {
+
+            return true;
+        }
+
+
+        if (
+            boardState[i + (step * 2)] === 0 &&
+            boardState[i + step] !== 0
+        ) {
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+/* =========================================================
+   CONTROLE DAS FASES
+   ========================================================= */
+
+function switchLevel(level) {
+
+    if (level <= maxUnlockedLevel) {
+
+        loadLevel(level);
+
+    } else {
+
+        showFeedback(
+            "Conclua a fase anterior para desbloquear esta fase!"
+        );
+    }
+}
+
+
+function resetCurrentLevel() {
+
+    loadLevel(currentLevel);
+}
+
+
+function nextLevel() {
+
+    if (currentLevel < 5) {
+
+        loadLevel(
+            currentLevel + 1
+        );
+    }
+
+    closeModal("victoryModal");
+}
+
+
+/* =========================================================
+   MODAIS
+   ========================================================= */
+
+function openModal(id) {
+
+    document.getElementById(id)
+        .className = "modal show";
+}
+
+
+function closeModal(id) {
+
+    document.getElementById(id)
+        .className = "modal";
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+   ========================================================= */
+
+window.onload = function() {
+
+    loadLevel(1);
+};
+
+</script>
+
+</body>
+</html>
