@@ -3,13 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pulo dos Sapos - Versão Leve</title>
+<title>Pulo dos Sapos - Frog Hop</title>
 
 <style>
 /* =========================================================
-   PULO DOS SAPOS - Refatorado
-   Versão Lite - sem bibliotecas externas
-   Compatível com Firefox antigo
+   GAME - PULO DOS SAPOS - Frog Hop
    ========================================================= */
 
 * {
@@ -466,29 +464,6 @@ button {
     box-shadow: 28px 0 var(--shadow);
 }
 
-.direction {
-    position: absolute;
-    left: 4px;
-    bottom: -17px;
-    width: 34px;
-    height: 21px;
-    border: 1px solid rgba(255,255,255,.75);
-    border-radius: 20px;
-    background: var(--color);
-    color: white;
-    font-size: 18px;
-    line-height: 19px;
-    font-weight: bold;
-}
-
-.direction.right:after {
-    content: ">";
-}
-
-.direction.left:after {
-    content: "<";
-}
-
 /* ---------- ANIMAÇÕES ---------- */
 
 .jump {
@@ -677,32 +652,130 @@ button {
     display: inline-block;
 }
 
-.tutorial-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: #1b273c;
+/* Demonstracao isolada do tutorial: CSS simples, sem dependencias. */
+#tutorialModal .tutorial-demo {
+    padding: 16px 8px;
     border: 1px solid #34435a;
     border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 9px;
-}
-
-.tutorial-icon {
-    width: 45px;
-    flex-shrink: 0;
+    background: #1b273c;
     text-align: center;
-    font-size: 27px;
 }
-
-.tutorial-item h4 {
-    margin: 0 0 4px;
-    color: #68e79a;
+#tutorialModal .tutorial-track {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    height: 150px;
+    margin: 0 auto;
 }
-
-.tutorial-item p {
-    margin: 0;
-    font-size: 14px;
+#tutorialModal .tutorial-stone {
+    position: absolute;
+    top: 104px;
+    width: 20%;
+    height: 46px;
+    cursor: default;
+}
+#tutorialModal .tutorial-stone.first { left: 7%; }
+#tutorialModal .tutorial-stone.middle { left: 40%; }
+#tutorialModal .tutorial-stone.last { left: 73%; }
+#tutorialModal .tutorial-frog {
+    position: absolute;
+    top: 81px;
+    width: 24%;
+    height: 55px;
+    z-index: 2;
+}
+#tutorialModal .tutorial-frog .frog-holder { top: 0; }
+#tutorialModal .tutorial-green { left: 5%; }
+#tutorialModal .tutorial-red { left: 71%; }
+/* Cores explicitas tambem funcionam sem suporte a variaveis CSS. */
+#tutorialModal .tutorial-green .frog {
+    background: #22c55e;
+    box-shadow: inset 0 -5px 0 #15803d, 0 4px 6px rgba(0,0,0,.45);
+}
+#tutorialModal .tutorial-red .frog {
+    background: #ef4444;
+    box-shadow: inset 0 -5px 0 #b91c1c, 0 4px 6px rgba(0,0,0,.45);
+}
+#tutorialModal .tutorial-green .frog:before,
+#tutorialModal .tutorial-green .frog:after {
+    background: #22c55e;
+    box-shadow: inset 0 -2px 0 #15803d;
+}
+#tutorialModal .tutorial-red .frog:before,
+#tutorialModal .tutorial-red .frog:after {
+    background: #ef4444;
+    box-shadow: inset 0 -2px 0 #b91c1c;
+}
+#tutorialModal .tutorial-green .frog-feet {
+    background: #15803d;
+    box-shadow: 28px 0 #15803d;
+}
+#tutorialModal .tutorial-red .frog-feet {
+    background: #b91c1c;
+    box-shadow: 28px 0 #b91c1c;
+}
+#tutorialModal.show .tutorial-green { animation: tutorialGreen 12s linear infinite; }
+#tutorialModal.show .tutorial-red { animation: tutorialRed 12s linear infinite; }
+#tutorialModal .tutorial-captions {
+    position: relative;
+    height: 104px;
+    margin: 12px 0 10px;
+    color: #d3deec;
+    font-size: 16px;
+    line-height: 1.5;
+}
+#tutorialModal .tutorial-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    visibility: hidden;
+}
+#tutorialModal .tutorial-caption.one { visibility: visible; }
+#tutorialModal.show .tutorial-caption.one { animation: tutorialCaptionOne 12s step-end infinite; }
+#tutorialModal.show .tutorial-caption.two { animation: tutorialCaptionTwo 12s step-end infinite; }
+#tutorialModal.show .tutorial-caption.three { animation: tutorialCaptionThree 12s step-end infinite; }
+#tutorialModal.show .tutorial-caption.four { animation: tutorialCaptionFour 12s step-end infinite; }
+#tutorialModal .modal-buttons .action-button { margin: 4px; }
+#tutorialModal .tutorial-demo.paused .tutorial-frog,
+#tutorialModal .tutorial-demo.paused .tutorial-caption { animation-play-state: paused; }
+@keyframes tutorialGreen {
+    0%, 15% { left: 5%; top: 81px; }
+    19% { left: 21.5%; top: 50px; }
+    23%, 58% { left: 38%; top: 81px; }
+    62% { left: 54.5%; top: 50px; }
+    66%, 99.9% { left: 71%; top: 81px; }
+    100% { left: 5%; top: 81px; }
+}
+@keyframes tutorialRed {
+    0%, 36% { left: 71%; top: 81px; }
+    42% { left: 38%; top: 23px; }
+    48%, 99.9% { left: 5%; top: 81px; }
+    100% { left: 71%; top: 81px; }
+}
+@keyframes tutorialCaptionOne {
+    0% { visibility: visible; }
+    30% { visibility: hidden; }
+    100% { visibility: visible; }
+}
+@keyframes tutorialCaptionTwo {
+    0% { visibility: hidden; }
+    30% { visibility: visible; }
+    55%, 100% { visibility: hidden; }
+}
+@keyframes tutorialCaptionThree {
+    0% { visibility: hidden; }
+    55% { visibility: visible; }
+    74%, 100% { visibility: hidden; }
+}
+@keyframes tutorialCaptionFour {
+    0% { visibility: hidden; }
+    74% { visibility: visible; }
+    100% { visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #tutorialModal.show .tutorial-frog,
+    #tutorialModal.show .tutorial-caption { animation: none; }
 }
 
 .modal-buttons {
@@ -817,9 +890,6 @@ button {
         transform: translateX(-50%) scale(.70);
     }
 
-    .direction {
-        display: none;
-    }
 }
 </style>
 </head>
@@ -1004,60 +1074,36 @@ button {
 
             <h3>🐸 Como Jogar com os Sapinhos!</h3>
 
-            <div class="tutorial-item">
-
-                <div class="tutorial-icon">🐸</div>
-
-                <div>
-                    <h4>Sapos Verdes</h4>
-                    <p>
-                        Começam à esquerda e seguem para a direita.
-                        Clique em um sapo verde para movê-lo.
-                    </p>
+            <div id="tutorial-demo" class="tutorial-demo">
+                <div class="tutorial-track" role="img" aria-label="Clique no sapo. Verdes seguem para a direita e vermelhos para a esquerda, sem voltar. Avance para a pedra vazia ao lado ou pule sobre um sapo para uma pedra vazia. Troque todos de lado para vencer.">
+                    <span class="stone tutorial-stone first" aria-hidden="true"></span>
+                    <span class="stone tutorial-stone middle" aria-hidden="true"></span>
+                    <span class="stone tutorial-stone last" aria-hidden="true"></span>
+                    <div class="tutorial-frog tutorial-green" aria-hidden="true">
+                        <div class="frog-holder">
+                            <div class="frog">
+                                <span class="frog-eyes"></span>
+                                <span class="frog-belly"></span>
+                                <span class="frog-feet"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tutorial-frog tutorial-red" aria-hidden="true">
+                        <div class="frog-holder">
+                            <div class="frog">
+                                <span class="frog-eyes"></span>
+                                <span class="frog-belly"></span>
+                                <span class="frog-feet"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
-            <div class="tutorial-item">
-
-                <div class="tutorial-icon">🐸</div>
-
-                <div>
-                    <h4 style="color:#ff7189;">Sapos Vermelhos</h4>
-                    <p>
-                        Começam à direita e seguem para a esquerda.
-                        Clique em um sapo vermelho para movê-lo.
-                    </p>
+                <div class="tutorial-captions" aria-hidden="true">
+                    <span class="tutorial-caption one">1. Clique no sapo para mover.<br>Verde &rarr; &nbsp; Vermelho &larr; &nbsp; Sem voltar.</span>
+                    <span class="tutorial-caption two">2. Pule sobre um sapo<br>para uma pedra vazia.</span>
+                    <span class="tutorial-caption three">3. Ou avance para<br>a pedra vazia ao lado.</span>
+                    <span class="tutorial-caption four">Troque todos de lado!<br>Vermelhos &agrave; esquerda, verdes &agrave; direita.</span>
                 </div>
-
-            </div>
-
-            <div class="tutorial-item">
-
-                <div class="tutorial-icon">📖</div>
-
-                <div>
-                    <h4 style="color:#ffe76a;">Como pular</h4>
-                    <p>
-                        Um sapo pode avançar para a pedra vazia ao lado
-                        ou pular por cima de outro sapo.
-                    </p>
-                </div>
-
-            </div>
-
-            <div class="tutorial-item">
-
-                <div class="tutorial-icon">🏆</div>
-
-                <div>
-                    <h4 style="color:#61d8ee;">Objetivo</h4>
-                    <p>
-                        Leve todos os sapos verdes para a direita
-                        e todos os vermelhos para a esquerda.
-                    </p>
-                </div>
-
             </div>
 
             <div class="modal-buttons">
@@ -1066,6 +1112,14 @@ button {
                     class="action-button green"
                     onclick="closeModal('tutorialModal')">
                     Jogar
+                </button>
+
+                <button
+                    type="button"
+                    class="action-button green"
+                    aria-pressed="false"
+                    onclick="var demo = document.getElementById('tutorial-demo'); var paused = this.getAttribute('aria-pressed') !== 'true'; demo.className = paused ? 'tutorial-demo paused' : 'tutorial-demo'; this.setAttribute('aria-pressed', paused ? 'true' : 'false'); this.innerHTML = paused ? 'Continuar demonstra&amp;ccedil;&amp;atilde;o' : 'Pausar demonstra&amp;ccedil;&amp;atilde;o';">
+                    Pausar demonstra&ccedil;&atilde;o
                 </button>
 
             </div>
@@ -1608,16 +1662,7 @@ function renderBoard(animatedIndex) {
             frog.appendChild(feet);
 
 
-            var direction =
-                document.createElement("span");
-
-            direction.className =
-                "direction " +
-                (value === 1 ? "right" : "left");
-
-
             holder.appendChild(frog);
-            holder.appendChild(direction);
 
             stone.appendChild(holder);
         }
